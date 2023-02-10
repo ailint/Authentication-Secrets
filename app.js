@@ -27,7 +27,7 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-mongoose.connect("mongodb://localhost:27017/userDB", {useNewUrlParser: true});
+mongoose.connect("mongodb+srv://ailin-admin:ailin-admin-password@cluster0.htqyino.mongodb.net/userDB", {useNewUrlParser: true});
 // mongoose.set("useCreateIndex", true); //it has been deprecated and it's not needed
 
 const userSchema = new mongoose.Schema({
