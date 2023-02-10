@@ -9,7 +9,6 @@ const passport = require("passport");
 const passportLocalMongoose = require("passport-local-mongoose");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const findOrCreate = require("mongoose-findorcreate");
-require("dotenv").config()
 
 const app = express();
 const PORT = process.env.PORT || 3000;
