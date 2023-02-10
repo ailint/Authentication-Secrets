@@ -34,7 +34,7 @@ const userSchema = new mongoose.Schema({
     email: String,
     password: String,
     googleId: String,
-    secret: String 
+    secrets: [{type:String}]
 });
 
 userSchema.plugin(passportLocalMongoose);
@@ -61,7 +61,7 @@ passport.use(new GoogleStrategy({
     userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo"
   },
   function(accessToken, refreshToken, profile, cb) {
-    console.log(profile);
+    // console.log(profile);
     User.findOrCreate({ googleId: profile.id }, function (err, user) {
       return cb(err, user);
     });
@@ -92,12 +92,28 @@ app.get("/register", function(req, res){
 });
 
 app.get("/secrets", function(req, res){
-    User.find({"secret": {$ne: null}}, function(err, foundUsers){
+    User.find({"secrets": {$ne: null}}, function(err, foundUsers){
          if (err) {
              console.log(err);
          } else {
             if (foundUsers) {
-                res.render("secrets", {usersWithSecrets: foundUsers}); 
+                var allUserSecrets = ["Add your secrets below"];
+                // loop through each user
+                foundUsers.forEach(function(user){
+                    // loop through secrets for the user
+                    user.secrets.forEach(function(secret){
+                        // add their secrets one by one to the mega secrets array
+                        allUserSecrets.push(secret);
+                    });
+                });
+                // my shuffle() function
+                // function shuffle(array) {
+                //     array.sort(() => Math.random() - 0.5);
+                // };
+                // allUserSecrets = shuffle(allUserSecrets);
+                // console.log(allUserSecrets);
+
+                res.render("secrets", {allSecrets: allUserSecrets}); 
             }
          }
     });
@@ -114,14 +130,14 @@ app.get("/submit", function(req, res){
 app.post("/submit", function(req, res){
      const submittedSecret = req.body.secret;
 
-    console.log(req.user.id);
+    // console.log(req.user.id);
 
     User.findById(req.user.id, function(err, foundUser){
         if (err) {
             console.log(err);
         } else {
             if (foundUser) {
-                foundUser.secret = submittedSecret;
+                foundUser.secrets.push(submittedSecret);
                 foundUser.save(function(){
                     res.redirect("/secrets");
                 });
@@ -170,7 +186,6 @@ app.post("/login", function(req, res){
     });
     
 });
-
 
 
 app.listen(3000, function() {
